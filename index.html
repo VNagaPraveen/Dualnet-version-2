@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DualNet — Smarter planning across all your pallet networks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --gold: #F5C400;
+    --gold-dim: rgba(245,196,0,0.12);
+    --gold-border: rgba(245,196,0,0.28);
+    --dark: #111008;
+    --dark-card: #1C1A0E;
+    --dark-card2: #242210;
+    --white: #FAFAF6;
+    --muted: rgba(250,250,246,0.55);
+    --faint: rgba(250,250,246,0.12);
+    --border: rgba(250,250,246,0.1);
+    --green: #6BBF3C;
+    --red: #E05454;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--dark);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── UTILITY ── */
+  .container { max-width: 1140px; margin: 0 auto; padding: 0 40px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 500; letter-spacing: .15em;
+    text-transform: uppercase; color: var(--gold); opacity: .8;
+    display: block; margin-bottom: 12px;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(17,16,8,0.88);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; gap: 24px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-size: 21px; font-weight: 800;
+    text-decoration: none; color: var(--white); white-space: nowrap;
+  }
+  .logo-icon {
+    width: 34px; height: 34px; flex-shrink: 0;
+  }
+  .logo span { color: var(--gold); }
+  .nav-links {
+    display: flex; gap: 28px; list-style: none;
+  }
+  .nav-links a {
+    font-size: 14px; color: var(--muted); text-decoration: none;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-ctas { display: flex; gap: 10px; align-items: center; }
+  .btn-ghost {
+    background: transparent; color: var(--white);
+    border: 1px solid var(--border); border-radius: 100px;
+    padding: 9px 20px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .btn-ghost:hover { border-color: rgba(250,250,246,0.3); background: var(--faint); }
+  .btn-gold {
+    background: var(--gold); color: #1a1500;
+    border: none; border-radius: 100px;
+    padding: 9px 20px; font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    transition: opacity .2s; white-space: nowrap;
+  }
+  .btn-gold:hover { opacity: .85; }
+  .btn-gold.lg { padding: 14px 32px; font-size: 15px; }
+
+  /* ── HERO ── */
+  #hero {
+    display: grid; grid-template-columns: 1fr 1fr; min-height: 540px;
+  }
+  .hero-left {
+    padding: 80px 48px 80px 0;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .hero-title {
+    font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800;
+    line-height: 1.05; margin-bottom: 20px; color: var(--white);
+  }
+  .hero-title em { color: var(--gold); font-style: normal; }
+  .hero-sub {
+    font-size: 17px; color: var(--muted); line-height: 1.7;
+    max-width: 430px; margin-bottom: 36px;
+  }
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-right {
+    background: var(--dark-card);
+    padding: 48px 40px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-right::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(245,196,0,.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    width: 100%; max-width: 340px; position: relative; z-index: 1;
+  }
+  .stat-card {
+    background: var(--gold-dim); border: 1px solid var(--gold-border);
+    border-radius: var(--radius); padding: 22px 18px;
+    animation: fadeUp .6s ease both;
+  }
+  .stat-card:nth-child(1) { animation-delay: .1s; }
+  .stat-card:nth-child(2) { animation-delay: .2s; }
+  .stat-card:nth-child(3) { animation-delay: .3s; }
+  .stat-card:nth-child(4) { animation-delay: .4s; }
+  .stat-card.wide {
+    grid-column: 1/-1;
+    background: var(--faint); border-color: var(--border);
+    display: flex; align-items: center; gap: 18px;
+    animation-delay: .5s;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-size: 34px;
+    font-weight: 800; color: var(--gold); line-height: 1;
+  }
+  .stat-card.wide .stat-num { font-size: 26px; white-space: nowrap; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+  .stat-card.wide .stat-label { font-size: 13px; margin-top: 0; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── TRUST BAR ── */
+  #trust {
+    background: var(--dark-card2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 22px 0;
+  }
+  .trust-inner {
+    display: flex; align-items: center; justify-content: center;
+    gap: 40px; flex-wrap: wrap;
+  }
+  .trust-item {
+    font-size: 13px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .trust-item strong { color: var(--white); }
+  .trust-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--gold); opacity: .5;
+  }
+
+  /* ── SECTIONS GENERAL ── */
+  section { padding: 88px 0; }
+  .section-head { margin-bottom: 48px; }
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 34px;
+    font-weight: 700; color: var(--white); line-height: 1.15;
+  }
+
+  /* ── HOW IT WORKS ── */
+  #how { background: var(--dark); }
+  .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+  .step {
+    background: var(--dark-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 32px 28px;
+    position: relative; overflow: hidden;
+    transition: border-color .25s;
+  }
+  .step:hover { border-color: var(--gold-border); }
+  .step::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: linear-gradient(90deg, var(--gold), transparent);
+    opacity: 0; transition: opacity .25s;
+  }
+  .step:hover::after { opacity: 1; }
+  .step-num {
+    font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800;
+    color: var(--gold); opacity: .18; line-height: 1; margin-bottom: 16px;
+  }
+  .step-title { font-size: 18px; font-weight: 500; margin-bottom: 10px; }
+  .step-body { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+  /* ── METRICS ── */
+  #metrics { background: var(--dark-card); }
+  .metrics-grid {
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 2px;
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .metric {
+    padding: 40px 28px; background: var(--dark-card);
+    border-right: 1px solid var(--border);
+    text-align: center;
+    transition: background .25s;
+  }
+  .metric:last-child { border-right: none; }
+  .metric:hover { background: var(--dark-card2); }
+  .metric-num {
+    font-family: 'Syne', sans-serif; font-size: 44px;
+    font-weight: 800; color: var(--gold); line-height: 1;
+    margin-bottom: 10px;
+  }
+  .metric-label { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+  /* ── COMPARISON ── */
+  #comparison { background: var(--dark); }
+  .compare-wrap {
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .compare-table th {
+    padding: 18px 22px; text-align: left; font-weight: 500;
+    font-size: 13px; border-bottom: 1px solid var(--border);
+    background: var(--dark-card2);
+  }
+  .compare-table th.col-us {
+    background: #211F0A; color: var(--gold); text-align: center;
+  }
+  .compare-table th.col-them { text-align: center; color: var(--muted); }
+  .compare-table td {
+    padding: 16px 22px; border-bottom: 1px solid var(--border);
+    color: var(--white); vertical-align: middle;
+  }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td.col-us {
+    background: rgba(245,196,0,.03); text-align: center;
+  }
+  .compare-table td.col-them { text-align: center; color: var(--muted); }
+  .tick { color: var(--green); font-size: 17px; font-weight: 700; }
+  .cross { color: var(--red); font-size: 17px; font-weight: 700; }
+  .badge-us {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--white);
+  }
+  .badge-them {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* ── TESTIMONIAL ── */
+  #testimonial {
+    background: var(--dark-card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .testimonial-inner {
+    display: flex; align-items: center; gap: 56px;
+  }
+  .testi-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: var(--gold); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    color: #1a1500;
+  }
+  .testi-stars { color: var(--gold); font-size: 17px; letter-spacing: 3px; margin-bottom: 14px; }
+  .testi-quote {
+    font-size: 20px; line-height: 1.65; color: rgba(250,250,246,.88);
+    font-style: italic; max-width: 580px;
+  }
+  .testi-author { margin-top: 18px; font-size: 13px; color: var(--muted); }
+
+  /* ── INTEGRATIONS ── */
+  #integrations { background: var(--dark); }
+  .integration-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
+  }
+  .integ-card {
+    background: var(--dark-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px 24px;
+    display: flex; align-items: flex-start; gap: 16px;
+    transition: border-color .25s;
+  }
+  .integ-card:hover { border-color: var(--gold-border); }
+  .integ-icon {
+    width: 40px; height: 40px; border-radius: var(--radius-sm);
+    background: var(--gold-dim); border: 1px solid var(--gold-border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 20px;
+  }
+  .integ-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+  .integ-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* ── FAQ ── */
+  #faq { background: var(--dark-card); }
+  .faq-list { display: flex; flex-direction: column; gap: 0; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+  }
+  .faq-item:first-child { border-top: 1px solid var(--border); }
+  .faq-q {
+    width: 100%; background: transparent; border: none; color: var(--white);
+    text-align: left; padding: 22px 0; font-size: 15px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  }
+  .faq-q:hover { color: var(--gold); }
+  .faq-icon {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--faint); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 15px; transition: transform .3s, background .2s;
+    color: var(--gold);
+  }
+  .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--gold-dim); }
+  .faq-a {
+    font-size: 14px; color: var(--muted); line-height: 1.75;
+    max-height: 0; overflow: hidden; transition: max-height .35s ease, padding .3s;
+    padding: 0;
+  }
+  .faq-item.open .faq-a { max-height: 300px; padding-bottom: 22px; }
+
+  /* ── PRICING ── */
+  #pricing { background: var(--dark); }
+  .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 720px; }
+  .price-card {
+    background: var(--dark-card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 36px 30px;
+  }
+  .price-card.featured {
+    background: var(--dark-card2);
+    border-color: var(--gold-border);
+    position: relative;
+  }
+  .price-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--gold); color: #1a1500; font-size: 11px; font-weight: 500;
+    padding: 4px 14px; border-radius: 100px; white-space: nowrap;
+  }
+  .price-plan { font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 10px; }
+  .price-val {
+    font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800;
+    color: var(--white); margin-bottom: 6px;
+  }
+  .price-note { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .price-features li {
+    font-size: 14px; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; }
+
+  /* ── CTA SECTION ── */
+  #cta {
+    background: var(--dark-card);
+    border-top: 1px solid var(--border);
+    text-align: center; padding: 96px 0;
+  }
+  .cta-title {
+    font-family: 'Syne', sans-serif; font-size: 42px;
+    font-weight: 800; margin-bottom: 14px; line-height: 1.1;
+  }
+  .cta-sub { font-size: 17px; color: var(--muted); margin-bottom: 36px; }
+  .cta-pills { display: flex; gap: 12px; justify-content: center; margin-bottom: 36px; flex-wrap: wrap; }
+  .pill {
+    background: var(--faint); border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 18px;
+    font-size: 13px; font-weight: 500; color: var(--muted);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 32px 0; border-top: 1px solid var(--border);
+    background: var(--dark);
+  }
+  .footer-inner {
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .2s; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-copy { font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ───────────────── NAV ───────────────── -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <svg class="logo-icon" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="1" y="1" width="13" height="13" rx="3" fill="#F5C400"/>
+          <rect x="20" y="1" width="13" height="13" rx="3" fill="#F5C400" opacity=".35"/>
+          <rect x="1" y="20" width="13" height="13" rx="3" fill="#F5C400" opacity=".35"/>
+          <rect x="20" y="20" width="13" height="13" rx="3" fill="#F5C400"/>
+        </svg>
+        Dual<span>Net</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#comparison">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-ctas">
+        <button class="btn-ghost">Sign in</button>
+        <button class="btn-gold">Book a demo</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ───────────────── HERO ───────────────── -->
+<section id="hero">
+  <div class="container" style="display:contents">
+    <div style="display:grid;grid-template-columns:1fr 1fr;min-height:540px;max-width:100%">
+      <div class="hero-left container" style="padding-right:48px">
+        <span class="eyebrow">Pallet network optimisation</span>
+        <h1 class="hero-title">Smarter planning<br>across <em>all your</em><br>pallet networks</h1>
+        <p class="hero-sub">DualNet brings all your pallet networks into one place, finds the most efficient plan, and sends it back — automatically.</p>
+        <div class="hero-ctas">
+          <button class="btn-gold lg">Book a 30-min demo</button>
+          <button class="btn-ghost" style="padding:14px 28px;font-size:15px">Learn more</button>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-num">80%</div>
+            <div class="stat-label">Less time spent planning</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">20%</div>
+            <div class="stat-label">Improvement in efficiency</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">90%</div>
+            <div class="stat-label">Fewer calls chasing updates</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">Zero</div>
+            <div class="stat-label">Double keying of data</div>
+          </div>
+          <div class="stat-card wide">
+            <div class="stat-num">Live in 24h</div>
+            <div class="stat-label">No long implementation project required. Up and running in 24 hours.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── TRUST BAR ───────────────── -->
+<div id="trust">
+  <div class="container">
+    <div class="trust-inner">
+      <div class="trust-item"><strong>No cost</strong></div>
+      <div class="trust-dot"></div>
+      <div class="trust-item"><strong>No commitment</strong></div>
+      <div class="trust-dot"></div>
+      <div class="trust-item"><strong>Live in 24 hours</strong></div>
+      <div class="trust-dot"></div>
+      <div class="trust-item">Works with <strong>all pallet networks</strong></div>
+      <div class="trust-dot"></div>
+      <div class="trust-item">⭐⭐⭐⭐ <strong>4/5</strong> customer rating</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────── HOW IT WORKS ───────────────── -->
+<section id="how">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2 class="section-title">Three steps to smarter planning</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">/1</div>
+        <div class="step-title">Connect your networks</div>
+        <p class="step-body">DualNet pulls in live data from all your pallet networks automatically — including those with no data connection.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">/2</div>
+        <div class="step-title">Plan in one place</div>
+        <p class="step-body">See all consignments together and allocate resources for maximum efficiency from a single planning screen.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">/3</div>
+        <div class="step-title">Push the plan out</div>
+        <p class="step-body">DualNet sends the optimised plan back to each network automatically. No re-keying. No manual steps.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── METRICS ───────────────── -->
+<section id="metrics">
+  <div class="container">
+    <div class="section-head" style="text-align:center">
+      <span class="eyebrow">Results</span>
+      <h2 class="section-title">The numbers that matter</h2>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric">
+        <div class="metric-num">80%</div>
+        <div class="metric-label">Less time spent planning</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num">Zero</div>
+        <div class="metric-label">Double keying of data</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num">90%</div>
+        <div class="metric-label">Fewer calls chasing updates</div>
+      </div>
+      <div class="metric">
+        <div class="metric-num">20%</div>
+        <div class="metric-label">Improvement in efficiency</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── COMPARISON ───────────────── -->
+<section id="comparison">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Why DualNet</span>
+      <h2 class="section-title">DualNet vs typical alternatives</h2>
+    </div>
+    <div class="compare-wrap">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th style="width:40%">Feature</th>
+            <th class="col-us" style="width:30%">DualNet</th>
+            <th class="col-them" style="width:30%">Typical alternatives</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Works with all networks, including those with no data connection</td>
+            <td class="col-us"><span class="badge-us"><span class="tick">✓</span> All networks covered</span></td>
+            <td class="col-them"><span class="badge-them"><span class="cross">✕</span> Connected networks only</span></td>
+          </tr>
+          <tr>
+            <td>Two-way sync — import data and export plans automatically</td>
+            <td class="col-us"><span class="badge-us"><span class="tick">✓</span> Fully automatic</span></td>
+            <td class="col-them"><span class="badge-them"><span class="cross">✕</span> Manual steps required</span></td>
+          </tr>
+          <tr>
+            <td>Consolidated planning across all networks in one view</td>
+            <td class="col-us"><span class="badge-us"><span class="tick">✓</span> Single planning screen</span></td>
+            <td class="col-them"><span class="badge-them"><span class="cross">✕</span> Switch between systems</span></td>
+          </tr>
+          <tr>
+            <td>Up and running with no long implementation project</td>
+            <td class="col-us"><span class="badge-us"><span class="tick">✓</span> Live in 24 hours</span></td>
+            <td class="col-them"><span class="badge-them"><span class="cross">✕</span> Weeks of setup</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── TESTIMONIAL ───────────────── -->
+<section id="testimonial">
+  <div class="container">
+    <div class="testimonial-inner">
+      <div class="testi-avatar" aria-hidden="true">MP</div>
+      <div>
+        <div class="testi-stars" aria-label="4 out of 5 stars">★★★★</div>
+        <blockquote class="testi-quote">
+          "We looked at cheaper options but they couldn't connect to all our networks. DualNet was the only one that just worked — and the results speak for themselves."
+        </blockquote>
+        <p class="testi-author">Customer · Logistics Operations</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── INTEGRATIONS ───────────────── -->
+<section id="integrations">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Compatibility</span>
+      <h2 class="section-title">Works with your existing setup</h2>
+    </div>
+    <div class="integration-grid">
+      <div class="integ-card">
+        <div class="integ-icon">🔗</div>
+        <div>
+          <div class="integ-title">All pallet networks</div>
+          <p class="integ-body">Connects to every major pallet network, including those with no data feed or digital connection.</p>
+        </div>
+      </div>
+      <div class="integ-card">
+        <div class="integ-icon">🔄</div>
+        <div>
+          <div class="integ-title">Two-way data sync</div>
+          <p class="integ-body">Automatically imports live data and exports optimised plans back to each network. No manual steps.</p>
+        </div>
+      </div>
+      <div class="integ-card">
+        <div class="integ-icon">⚡</div>
+        <div>
+          <div class="integ-title">Live in 24 hours</div>
+          <p class="integ-body">No lengthy IT project. DualNet is designed to be up and running within a single working day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── FAQ ───────────────── -->
+<section id="faq">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">FAQ</span>
+      <h2 class="section-title">Common questions</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How long does setup take?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">DualNet is designed to be live within 24 hours. There's no long implementation project — we connect to your networks, configure the plan logic, and you're up and running the same day.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Which pallet networks are supported?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">DualNet works with all pallet networks — including those with no data connection. Unlike alternatives that only support connected networks, DualNet handles manual imports too, so no network is left out.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          Is there a contract or commitment?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">No. The free trial comes with no cost and no commitment. You can try DualNet with your own real networks and see the results before making any decision.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What does the free trial include?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">The free trial gives you full access to DualNet using your own pallet networks. You'll see real efficiency gains and real planning improvements — not a demo environment.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How does DualNet handle networks with no data feed?
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq-a">DualNet supports manual data import for networks without a direct data connection, so your entire pallet estate is consolidated into one planning view — regardless of each network's technical capabilities.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── PRICING ───────────────── -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Pricing</span>
+      <h2 class="section-title">Simple, transparent pricing</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-plan">Starter</div>
+        <div class="price-val">Free</div>
+        <div class="price-note">No cost, no commitment</div>
+        <ul class="price-features">
+          <li>Up to 2 pallet networks</li>
+          <li>Single planning screen</li>
+          <li>Live in 24 hours</li>
+          <li>Automatic plan export</li>
+        </ul>
+        <button class="btn-ghost" style="width:100%;padding:12px">Get started free</button>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">Most popular</div>
+        <div class="price-plan">Professional</div>
+        <div class="price-val">Contact us</div>
+        <div class="price-note">Custom pricing for your network size</div>
+        <ul class="price-features">
+          <li>Unlimited pallet networks</li>
+          <li>Two-way automatic sync</li>
+          <li>Priority onboarding</li>
+          <li>Dedicated account support</li>
+        </ul>
+        <button class="btn-gold" style="width:100%;padding:12px">Book a 30-min demo</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────────── CTA ───────────────── -->
+<section id="cta">
+  <div class="container">
+    <h2 class="cta-title">Try it with your own networks — free</h2>
+    <p class="cta-sub">Up and running in 24 hours. See the results for yourself.</p>
+    <div class="cta-pills">
+      <span class="pill">No cost</span>
+      <span class="pill">No commitment</span>
+      <span class="pill">Live in 24 hours</span>
+    </div>
+    <button class="btn-gold lg">Book a 30-min demo</button>
+  </div>
+</section>
+
+<!-- ───────────────── FOOTER ───────────────── -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="#" class="logo" style="font-size:18px">
+        <svg width="26" height="26" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="13" height="13" rx="3" fill="#F5C400"/>
+          <rect x="20" y="1" width="13" height="13" rx="3" fill="#F5C400" opacity=".35"/>
+          <rect x="1" y="20" width="13" height="13" rx="3" fill="#F5C400" opacity=".35"/>
+          <rect x="20" y="20" width="13" height="13" rx="3" fill="#F5C400"/>
+        </svg>
+        Dual<span>Net</span>
+      </a>
+      <span class="footer-copy">© 2026 DualNet. All rights reserved.</span>
+      <nav class="footer-links" aria-label="Footer navigation">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+      </nav>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(el => {
+        el.classList.remove('open');
+        el.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+</script>
+</body>
+</html>
